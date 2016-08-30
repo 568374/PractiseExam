@@ -19,10 +19,12 @@ library(readr)
 library(tidyr)
 ```
 
+#Part 1
 ## Hello Octocat
 I love Octocat. She's the coolest cat in town.
 ! [](https://dl.dropboxusercontent.com/u/11805474/painblogr/biostats/images/octocat.png)
 
+#Part 2
 ```{r quick_look}
 #load data set
 data("anscombe")
@@ -43,6 +45,7 @@ tail(anscombe, 6)
 summary(anscombe)
 ```
 
+#Part 3
 ```{r xy_plot}
 #load data set
 data("anscombe")
@@ -60,6 +63,8 @@ graph <- plot(x = anscombe$x1, y = anscombe$y1,
 regline <- lm(y1 ~ x1, data = anscombe)
 abline(regline)
 ```
+
+#Part 4
 ```{r data_import}
 #load data set
 df_analgesic <- read_csv('analgesic.csv')
@@ -96,3 +101,131 @@ by_id
 report <- summarize(by_id, mean(data))
 report
 ```
+
+#Part 5
+## Chicken Weights
+```{r chicken_load}
+#load data set(chicken weights)
+df_chicken <- read_csv('chick-weights.csv')
+boxplot(weight ~ feed, data = df_chicken,
+        main = 'Boxplot representing different chicken feeds against chicken weights',
+        xlab = 'Chicken feed', ylab = 'Chicken weight')
+```
+
+
+**Null hypothesis:** Type of chicken feed has no effect on chicken weights.
+
+**Alternative hypothesis:** Type of chicken feed does have an effect on chicken weights.
+
+**Assumptions:**
+
+1. a = 0.05
+
+2. Unpaired data.
+
+3. Normally distributed, hence Parametric data set.
+
+4. Therefore One-way ANOVA required to test hypothesis.
+
+5. Reject null hypothesis if p < a
+
+```{r chicken_test}
+#One way ANOVA test
+chicken_test <- aov(weight ~ feed, data = df_chicken)
+summary(chicken_test)
+
+#post-hoc test (Pairwise)
+chicken_posthoc <- pairwise.t.test(df_chicken$weight, df_chicken$feed , 
+                                   p.adjust.method = 'holm' ,
+                                   paired = FALSE)
+chicken_posthoc
+
+#make a vector of p-values from each of planned comparisons
+p <- c('[test 1]' = 0.001, '[Test 2]' = 0.211, '[Test 3]' = 0.013)
+chicken_adjust <- p.adjust(p, method = 'holm')
+chicken_adjust
+```
+F (15.37) = 5.94e^-10; p = 0. Therefore reject null hypothesis, and accept alternative.
+
+**Conclusion:**Type of chicken feed does affect chicken weights.
+
+## The Hot Zone
+```{r hot_load}
+#load data set (hot_zone)
+df_hot <- read_csv('gastroenteritis.csv')
+head(df_hot)
+
+#Tabulate data set
+hot_table <- table(df_hot$Consumption, df_hot$Outcome)
+print(hot_table)
+
+#Cross-tabulate data set
+hot_cross <- xtabs(~Consumption + Outcome, data = df_hot)
+print(hot_cross)
+```
+
+**Null Hypothesis:** Drinking contaminated water does not cause gastroenteritis.
+
+**Alternative Hypothesis:** Drinking contaminated water does cause gasteroenteritis.
+
+**Assumptions:**
+
+1. a = 0.05
+
+2. Unpaired data set.
+
+3. Non-parametric.
+
+4. Therefore Chi squared test is required to test hypothesis.
+
+5. Reject null nypothesis if p < a.
+
+```{r hot_test}
+#Pearson Chi squared test
+hot_test <- chisq.test(hot_table, correct = FALSE)
+hot_test
+```
+X-squared (2, n=1094)= 74.925; p < 2.2e-16. Therefore reject null hypothesis and accept alternative.
+
+**Conclusion:** Drinking contaminated water does cause gastroenteritis.
+
+## Nausea
+```{r nausea_load}
+#load data set
+df_nausea <- read_csv('nausea.csv')
+print(df_nausea)
+
+#exclude outlier
+nausea_new <- df_nausea[-8, -1]
+print(nausea_new)
+
+#plot data set
+boxplot(nausea_new, 
+        main = 'Boxplot representing data before and after treatment of 5HT3-receptor blocker',
+        xlab = 'Treatment', ylab = 'Intensity rating')
+```
+**Null Hypothesis:** The 5HT3-receptor blocker does not affect intensity of nausea.
+
+**Alternative Hypothesis:** The 5HT3-receptor blocker does affect intensity of nausea.
+
+**Assumptions:**
+
+1. a = 0.05
+
+2. Paired, ordinal data set
+
+3. Parametric.
+
+4. Therfore a Wilcox test is required to test hypothesis.
+
+5. Reject null hypothesis if p < a.
+
+```{r nausea_test}
+#Students t-test
+nausea_test <- wilcox.test(nausea_new$Nausea_before, nausea_new$Nausea_after,
+                           paired = TRUE)
+nausea_test
+```
+p = 0.04983, therefore reject null hypothesis and accept alternative.
+
+**Conclusion:** The 5HT3-receptor blocker does affect intensity of nausea.

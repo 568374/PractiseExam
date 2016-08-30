@@ -3,10 +3,16 @@ Practise Assignment
 Vishaylin J. Mahadeo
 August 30, 2016
 
+Part 1
+======
+
 Hello Octocat
 -------------
 
 I love Octocat. She's the coolest cat in town. ! [](https://dl.dropboxusercontent.com/u/11805474/painblogr/biostats/images/octocat.png)
+
+Part 2
+======
 
 ``` r
 #load data set
@@ -71,6 +77,9 @@ summary(anscombe)
     ##  3rd Qu.: 8.570   3rd Qu.:8.950   3rd Qu.: 7.98   3rd Qu.: 8.190  
     ##  Max.   :10.840   Max.   :9.260   Max.   :12.74   Max.   :12.500
 
+Part 3
+======
+
 ``` r
 #load data set
 data("anscombe")
@@ -90,6 +99,9 @@ abline(regline)
 ```
 
 <img src="figure/xy_plot-1.png" style="display: block; margin: auto;" />
+
+Part 4
+======
 
 ``` r
 #load data set
@@ -209,3 +221,237 @@ report
     ## 9      9   22.66667
     ## 10    10   24.00000
     ## # ... with 30 more rows
+
+Part 5
+======
+
+Chicken Weights
+---------------
+
+``` r
+#load data set(chicken weights)
+df_chicken <- read_csv('chick-weights.csv')
+boxplot(weight ~ feed, data = df_chicken,
+        main = 'Boxplot representing different chicken feeds against chicken weights',
+        xlab = 'Chicken feed', ylab = 'Chicken weight')
+```
+
+<img src="figure/chicken_load-1.png" style="display: block; margin: auto;" />
+
+**Null hypothesis:** Type of chicken feed has no effect on chicken weights.
+
+**Alternative hypothesis:** Type of chicken feed does have an effect on chicken weights.
+
+**Assumptions:**
+
+1.  a = 0.05
+
+2.  Unpaired data.
+
+3.  Normally distributed, hence Parametric data set.
+
+4.  Therefore One-way ANOVA required to test hypothesis.
+
+5.  Reject null hypothesis if p &lt; a
+
+``` r
+#One way ANOVA test
+chicken_test <- aov(weight ~ feed, data = df_chicken)
+summary(chicken_test)
+```
+
+    ##             Df Sum Sq Mean Sq F value   Pr(>F)    
+    ## feed         5 231129   46226   15.37 5.94e-10 ***
+    ## Residuals   65 195556    3009                     
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+``` r
+#post-hoc test (Pairwise)
+chicken_posthoc <- pairwise.t.test(df_chicken$weight, df_chicken$feed , 
+                                   p.adjust.method = 'holm' ,
+                                   paired = FALSE)
+chicken_posthoc
+```
+
+    ## 
+    ##  Pairwise comparisons using t tests with pooled SD 
+    ## 
+    ## data:  df_chicken$weight and df_chicken$feed 
+    ## 
+    ##           casein  horsebean linseed meatmeal soybean
+    ## horsebean 2.9e-08 -         -       -        -      
+    ## linseed   0.00016 0.09435   -       -        -      
+    ## meatmeal  0.18227 9.0e-05   0.09435 -        -      
+    ## soybean   0.00532 0.00298   0.51766 0.51766  -      
+    ## sunflower 0.81249 1.2e-08   8.1e-05 0.13218  0.00298
+    ## 
+    ## P value adjustment method: holm
+
+``` r
+#make a vector of p-values from each of planned comparisons
+p <- c('[test 1]' = 0.001, '[Test 2]' = 0.211, '[Test 3]' = 0.013)
+chicken_adjust <- p.adjust(p, method = 'holm')
+chicken_adjust
+```
+
+    ## [test 1] [Test 2] [Test 3] 
+    ##    0.003    0.211    0.026
+
+F (15.37) = 5.94e^-10; p = 0. Therefore reject null hypothesis, and accept alternative.
+
+**Conclusion:**Type of chicken feed does affect chicken weights.
+
+The Hot Zone
+------------
+
+``` r
+#load data set (hot_zone)
+df_hot <- read_csv('gastroenteritis.csv')
+head(df_hot)
+```
+
+    ## # A tibble: 6 x 2
+    ##       Consumption Outcome
+    ##             <chr>   <chr>
+    ## 1 < 1 glasses/day     ill
+    ## 2 < 1 glasses/day     ill
+    ## 3 < 1 glasses/day     ill
+    ## 4 < 1 glasses/day     ill
+    ## 5 < 1 glasses/day     ill
+    ## 6 < 1 glasses/day     ill
+
+``` r
+#Tabulate data set
+hot_table <- table(df_hot$Consumption, df_hot$Outcome)
+print(hot_table)
+```
+
+    ##                     
+    ##                      ill not ill
+    ##   < 1 glasses/day     39     121
+    ##   > 4 glasses/day    265     146
+    ##   1 to 4 glasses/day 265     258
+
+``` r
+#Cross-tabulate data set
+hot_cross <- xtabs(~Consumption + Outcome, data = df_hot)
+print(hot_cross)
+```
+
+    ##                     Outcome
+    ## Consumption          ill not ill
+    ##   < 1 glasses/day     39     121
+    ##   > 4 glasses/day    265     146
+    ##   1 to 4 glasses/day 265     258
+
+**Null Hypothesis:** Drinking contaminated water does not cause gastroenteritis.
+
+**Alternative Hypothesis:** Drinking contaminated water does cause gasteroenteritis.
+
+**Assumptions:**
+
+1.  a = 0.05
+
+2.  Unpaired data set.
+
+3.  Non-parametric.
+
+4.  Therefore Chi squared test is required to test hypothesis.
+
+5.  Reject null nypothesis if p &lt; a.
+
+``` r
+#Pearson Chi squared test
+hot_test <- chisq.test(hot_table, correct = FALSE)
+hot_test
+```
+
+    ## 
+    ##  Pearson's Chi-squared test
+    ## 
+    ## data:  hot_table
+    ## X-squared = 74.925, df = 2, p-value < 2.2e-16
+
+X-squared (2, n=1094)= 74.925; p &lt; 2.2e-16. Therefore reject null hypothesis and accept alternative.
+
+**Conclusion:** Drinking contaminated water does cause gastroenteritis.
+
+Nausea
+------
+
+``` r
+#load data set
+df_nausea <- read_csv('nausea.csv')
+print(df_nausea)
+```
+
+    ## # A tibble: 8 x 3
+    ##   Patient Nausea_before Nausea_after
+    ##     <int>         <int>        <int>
+    ## 1       1             3            2
+    ## 2       2             4            0
+    ## 3       3             6            1
+    ## 4       4             2            3
+    ## 5       5             2            1
+    ## 6       6             4            1
+    ## 7       7             5            0
+    ## 8       8             6           40
+
+``` r
+#exclude outlier
+nausea_new <- df_nausea[-8, -1]
+print(nausea_new)
+```
+
+    ## # A tibble: 7 x 2
+    ##   Nausea_before Nausea_after
+    ##           <int>        <int>
+    ## 1             3            2
+    ## 2             4            0
+    ## 3             6            1
+    ## 4             2            3
+    ## 5             2            1
+    ## 6             4            1
+    ## 7             5            0
+
+``` r
+#plot data set
+boxplot(nausea_new, 
+        main = 'Boxplot representing data before and after treatment of 5HT3-receptor blocker',
+        xlab = 'Treatment', ylab = 'Intensity rating')
+```
+
+<img src="figure/nausea_load-1.png" style="display: block; margin: auto;" /> **Null Hypothesis:** The 5HT3-receptor blocker does not affect intensity of nausea.
+
+**Alternative Hypothesis:** The 5HT3-receptor blocker does affect intensity of nausea.
+
+**Assumptions:**
+
+1.  a = 0.05
+
+2.  Paired, ordinal data set
+
+3.  Parametric.
+
+4.  Therfore a Wilcox test is required to test hypothesis.
+
+5.  Reject null hypothesis if p &lt; a.
+
+``` r
+#Students t-test
+nausea_test <- wilcox.test(nausea_new$Nausea_before, nausea_new$Nausea_after,
+                           paired = TRUE)
+nausea_test
+```
+
+    ## 
+    ##  Wilcoxon signed rank test with continuity correction
+    ## 
+    ## data:  nausea_new$Nausea_before and nausea_new$Nausea_after
+    ## V = 26, p-value = 0.04983
+    ## alternative hypothesis: true location shift is not equal to 0
+
+p = 0.04983, therefore reject null hypothesis and accept alternative.
+
+**Conclusion:** The 5HT3-receptor blocker does affect intensity of nausea.
