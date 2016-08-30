@@ -1,0 +1,10 @@
+---
+title: "Practise Assignment"
+author: "Vishaylin J. Mahadeo"
+date: "August 30, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
