@@ -15,3 +15,38 @@ library(tidyr)
 ## Hello Octocat
 I love Octocat. She's the coolest cat in town.
 ! [](https://dl.dropboxusercontent.com/u/11805474/painblogr/biostats/images/octocat.png)
+
+```{r quick_look}
+#load data set
+data("anscombe")
+
+#show dimensions of data set rows vs. columns
+dim(anscombe)
+
+#show first 6 rows
+head(anscombe, 6)
+
+#show last 6 rows
+tail(anscombe, 6)
+
+#summary statistics for each column
+summary(anscombe)
+```
+
+```{r xy_plot}
+#load data set
+data("anscombe")
+
+#scatter plot (with axis titles, red, and squares)
+graph <- plot(x = anscombe$x1, y = anscombe$y1,
+     main = 'Figure 1: Scatter plot of anscombe showing x1 vs. y1',
+     xlab = 'Anscombe (x1)',
+     ylab = 'Anscombe (y1)',
+     pch = 15 ,
+     col = 2 ,
+     lty = 2)
+
+#regression line
+regline <- lm(y1 ~ x1, data = anscombe)
+abline(regline)
+```
