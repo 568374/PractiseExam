@@ -6,7 +6,14 @@ output: github_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, warning = FALSE, fig.align = 'center', fig.path = 'figure/', fig.height = 8, fig.width = 8, fig.ext = 'png')
+knitr::opts_chunk$set(echo = TRUE ,
+                      warning = FALSE , 
+                      cache = TRUE ,
+                      fig.align = 'center' ,
+                      fig.path = 'figure/', 
+                      fig.height = 8, 
+                      fig.width = 8, 
+                      fig.ext = 'png')
 library(dplyr)
 library(readr)
 library(tidyr)
@@ -19,6 +26,9 @@ I love Octocat. She's the coolest cat in town.
 ```{r quick_look}
 #load data set
 data("anscombe")
+
+#column titles
+names(anscombe)
 
 #show dimensions of data set rows vs. columns
 dim(anscombe)
@@ -49,4 +59,40 @@ graph <- plot(x = anscombe$x1, y = anscombe$y1,
 #regression line
 regline <- lm(y1 ~ x1, data = anscombe)
 abline(regline)
+```
+```{r data_import}
+#load data set
+df_analgesic <- read_csv('analgesic.csv')
+```
+
+```{r data_summary}
+#dimensions of data set
+dim(df_analgesic)
+
+#names of column titles
+names(df_analgesic)
+
+#first 6 rows of data set
+head(df_analgesic)
+
+#last 6 rows of data set
+tail(df_analgesic)
+
+#summary statistics for each column
+summary(df_analgesic)
+```
+
+```{r data_tidy}
+#gather data from wide to long format
+gathered <- gather(data = df_analgesic ,
+                   key = measurements ,
+                   value = data, Measurement_1:Measurement_3)
+
+#group by individuals
+by_id <- group_by(gathered, ID)
+by_id
+
+#summarise and calculate mean
+report <- summarize(by_id, mean(data))
+report
 ```
