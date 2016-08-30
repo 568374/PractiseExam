@@ -2,9 +2,16 @@
 title: "Practise Assignment"
 author: "Vishaylin J. Mahadeo"
 date: "August 30, 2016"
-output: html_document
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, fig.align = 'center', fig.path = 'figure/', fig.height = 8, fig.width = 8, fig.ext = 'png')
+library(dplyr)
+library(readr)
+library(tidyr)
 ```
+
+## Hello Octocat
+I love Octocat. She's the coolest cat in town.
+! [](https://dl.dropboxusercontent.com/u/11805474/painblogr/biostats/images/octocat.png)
