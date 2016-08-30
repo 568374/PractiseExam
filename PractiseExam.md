@@ -94,8 +94,8 @@ graph <- plot(x = anscombe$x1, y = anscombe$y1,
      lty = 2)
 
 #regression line
-regline <- lm(y1 ~ x1, data = anscombe)
-abline(regline)
+regline1 <- lm(y1 ~ x1, data = anscombe)
+abline(regline1)
 ```
 
 <img src="figure/xy_plot-1.png" style="display: block; margin: auto;" />
@@ -422,7 +422,9 @@ boxplot(nausea_new,
         xlab = 'Treatment', ylab = 'Intensity rating')
 ```
 
-<img src="figure/nausea_load-1.png" style="display: block; margin: auto;" /> **Null Hypothesis:** The 5HT3-receptor blocker does not affect intensity of nausea.
+<img src="figure/nausea_load-1.png" style="display: block; margin: auto;" />
+
+**Null Hypothesis:** The 5HT3-receptor blocker does not affect intensity of nausea.
 
 **Alternative Hypothesis:** The 5HT3-receptor blocker does affect intensity of nausea.
 
@@ -455,3 +457,113 @@ nausea_test
 p = 0.04983, therefore reject null hypothesis and accept alternative.
 
 **Conclusion:** The 5HT3-receptor blocker does affect intensity of nausea.
+
+Part 6
+======
+
+Housing Prices
+--------------
+
+``` r
+#load data set
+df_house <- read_csv('housing-prices.csv')
+house_plot <- plot(df_house$interest_rate, df_house$median_house_price_USD,
+                   main = 'Scatter plot showing interest rates vs. house prices',
+                   xlab = 'Interest rate (%)', ylab = 'House price (USD)',
+                   pch = 15 , col = 2)
+
+#Regression line
+regline2 <- lm(median_house_price_USD ~ interest_rate, data = df_house)
+abline(regline2)
+```
+
+<img src="figure/house_load-1.png" style="display: block; margin: auto;" />
+
+``` r
+summary(regline2)
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = median_house_price_USD ~ interest_rate, data = df_house)
+    ## 
+    ## Residuals:
+    ##    Min     1Q Median     3Q    Max 
+    ## -55865 -31631 -16406  27212  80735 
+    ## 
+    ## Coefficients:
+    ##               Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)     399229      74427   5.364 9.99e-05 ***
+    ## interest_rate   -24309       9205  -2.641   0.0194 *  
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 43180 on 14 degrees of freedom
+    ##   (1 observation deleted due to missingness)
+    ## Multiple R-squared:  0.3325, Adjusted R-squared:  0.2848 
+    ## F-statistic: 6.974 on 1 and 14 DF,  p-value: 0.01937
+
+``` r
+#Check homoskedasticity
+homosk <- plot(x = regline2$fitted, y = regline2$residuals,
+               main = 'Homoskedasticity check',
+               xlab = 'Fitted', ylab = 'Residuals',
+               pch = 15 , col = 2)
+abline (h = 0)
+```
+
+<img src="figure/house_load-2.png" style="display: block; margin: auto;" />
+
+``` r
+#Check Gaussian distribution
+qqnorm(regline2$residuals)
+qqline(regline2$residuals)
+```
+
+<img src="figure/house_load-3.png" style="display: block; margin: auto;" />
+
+**Null hypothesis:** Interest rate (%) does not affect house prices (USD).
+
+**Alternative hypothesis:** Interest rate (%) does affect house prices (USD).
+
+**Assumptions:**
+
+1.  a = 0.05
+
+2.  Unpaired, continous data set
+
+3.  Rho = 0.2848, therefore weak relationship between interest rate and house price.
+
+4.  Residuals are homoskedasticity because they show zero spread around abline at 0.
+
+5.  Data fitted normaly around Q-Q plot, hence Gaussian residual distribution (i.e. normally distributed)
+
+6.  Reject null hypothesis if p &lt; a.
+
+7.  Therfore a Pearson's correlation is required to analyze data.
+
+``` r
+#Pearson correlation
+house_test <- with(df_house,
+                   cor.test(x = interest_rate, y = median_house_price_USD,
+                            method = 'pearson'))
+
+#print out result
+house_test
+```
+
+    ## 
+    ##  Pearson's product-moment correlation
+    ## 
+    ## data:  interest_rate and median_house_price_USD
+    ## t = -2.6409, df = 14, p-value = 0.01937
+    ## alternative hypothesis: true correlation is not equal to 0
+    ## 95 percent confidence interval:
+    ##  -0.8339619 -0.1133269
+    ## sample estimates:
+    ##        cor 
+    ## -0.5766386
+
+t(14) = -2.6409; r = -0.5766; p = 0.01937. Therefore reject null hypothesis and accept alternative.
+
+**Conclusion:** Interest rates (%) have a mild negative relationship with house prices (USD).
